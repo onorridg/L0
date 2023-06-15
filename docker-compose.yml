@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  pgsql:
+    image: postgres:latest
+    container_name: pgsql
+    restart: on-failure
+    networks:
+      - l0-services
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: "${PG_USER}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD}"
+      POSTGRES_DB: "${PG_DATABASE}"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "${PG_PORT}:${PG_PORT}"
+
+  nats-streaming:
+    image: "nats-streaming:latest"
+    container_name: nats-streaming
+    restart: on-failure
+    networks:
+      - l0-services
+    volumes:
+      - ./data/nats_data:/var/lib/nats-streaming/data
+    ports:
+      - "${NATS_PORT}:${NATS_PORT}"
+      - "${NATS_PORT_HTTP}:${NATS_PORT_HTTP}"
+    command:
+      - "--cluster_id"
+      - "${NATS_CLUSTER_ID}"
+      - "--http_port"
+      - "${NATS_PORT_HTTP}"
+
+networks:
+  l0-services:
+    driver: bridge
