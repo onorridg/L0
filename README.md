@@ -1,6 +1,6 @@
 # L0
 
-.env
+.env example:
 ```.env
 # postgresql
 PG_USER=admin
