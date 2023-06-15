@@ -1,20 +1,20 @@
 package env
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 )
 
 type data struct {
+	PgHost     string
 	PgUser     string
 	PgPassword string
-	PgPort     uint16
+	PgPort     string
 	PgDatabase string
 
-	NatsPort        uint16
-	NatsPortHttp    uint16
+	NatsPort        string
+	NatsPortHttp    string
 	NatsClusterId   string
 	NatsSubject     string
 	NatsGroup       string
@@ -31,12 +31,13 @@ func initEnv() {
 	}
 
 	envData = &data{}
+	envData.PgHost = os.Getenv("PG_HOST")
 	envData.PgUser = os.Getenv("PG_USER")
 	envData.PgPassword = os.Getenv("PG_PASSWORD")
-	fmt.Sscan(os.Getenv("PG_PORT"), &envData.PgPort)
+	envData.PgPort = os.Getenv("PG_PORT")
 
-	fmt.Sscan(os.Getenv("NATS_PORT"), &envData.NatsPort)
-	fmt.Sscan(os.Getenv("NATS_PORT_HTTP"), &envData.NatsPortHttp)
+	envData.NatsPort = os.Getenv("NATS_PORT")
+	envData.NatsPortHttp = os.Getenv("NATS_PORT_HTTP")
 	envData.NatsClusterId = os.Getenv("NATS_CLUSTER_ID")
 	envData.NatsSubject = os.Getenv("NATS_SUBJECT")
 	envData.NatsGroup = os.Getenv("NATS_GROUP")
