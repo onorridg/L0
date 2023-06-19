@@ -28,7 +28,7 @@ func (db *DB) insertItems(order *models.Order) {
 		queryStr := `
 		INSERT INTO item (order_uid, chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`
-		_, err = db.tx.ExecContext(db.txCtx, queryStr, parser.ItemStructToSlice(i, order))
+		_, err = db.tx.ExecContext(db.txCtx, queryStr, parser.ItemStructToSlice(i, order)...)
 		if err != nil {
 			db.tx.Rollback()
 			log.Println(err)
@@ -47,15 +47,15 @@ func (db *DB) InsertTransaction(order *models.Order) {
 	}
 
 	queryStr := `
-	INSERT INTO user_order (order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, name, phone, zip, city, address, region, email, transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee)
-	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)`
-	_, err = db.tx.ExecContext(db.txCtx, queryStr, parser.OrderStructToSlice(order))
+	INSERT INTO user_order (order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard, name, phone, zip, city, address, region, email, transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee)
+	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28)`
+	_, err = db.tx.ExecContext(db.txCtx, queryStr, parser.OrderStructToSlice(order)...)
 	if err != nil {
 		db.tx.Rollback()
 		log.Println(err)
 		return
 	}
-	//db.insertItems(order)
+	db.insertItems(order)
 
 	err = db.tx.Commit()
 	if err != nil {
@@ -76,14 +76,12 @@ func initConn() *sql.DB {
 	port := env.Get().PgPort
 	dbName := env.Get().PgDatabase
 	connStr := fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v sslmode=disable", user, password, host, port, dbName)
-	// Устанавливаем соединение с базой данных
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}
-	//defer db.Close()
 
-	// Проверяем подключение
 	err = db.Ping()
 	if err != nil {
 		panic(err)
