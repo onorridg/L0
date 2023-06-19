@@ -1,4 +1,4 @@
-PHONY: run sender worker
+PHONY: run sender worker polygon
 
 sender:
 	go run cmd/sender/sender.go
@@ -9,3 +9,5 @@ worker:
 run:
 	go run cmd/server/main.go
 
+polygon:
+	go run cmd/polygon/polygon.go

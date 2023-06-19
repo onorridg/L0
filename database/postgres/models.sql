@@ -1,6 +1,6 @@
 CREATE TABLE user_order (
                         id BIGSERIAL PRIMARY KEY,
-                        order_uid VARCHAR(255),
+                        order_uid VARCHAR(255) UNIQUE,
                         track_number VARCHAR(255),
                         entry VARCHAR(255),
                         locale VARCHAR(255),
@@ -10,6 +10,7 @@ CREATE TABLE user_order (
                         shardkey VARCHAR(255),
                         sm_id INT,
                         date_created TIMESTAMP,
+                        oof_shard INT,
                         name VARCHAR(255),
                         phone VARCHAR(255),
                         zip VARCHAR(255),
@@ -29,11 +30,11 @@ CREATE TABLE user_order (
                         custom_fee INT
 );
 
-CREATE TABLE items (
+CREATE TABLE item (
                        id BIGSERIAL PRIMARY KEY,
-                       order_id BIGSERIAL,
+                       order_uid VARCHAR,
                        chrt_id INT,
-                       track_number VARCHAR(255),
+                       track_number VARCHAR(255) UNIQUE,
                        price INT,
                        rid VARCHAR(255),
                        name VARCHAR(255),
@@ -43,5 +44,5 @@ CREATE TABLE items (
                        nm_id INT,
                        brand VARCHAR(255),
                        status INT,
-                       FOREIGN KEY (order_id) REFERENCES user_order (id)
+                       FOREIGN KEY (order_uid) REFERENCES user_order (order_uid)
 );

@@ -2,75 +2,74 @@ package worker
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
+	"l0/internal/env"
+	"l0/internal/models"
+	"l0/internal/postgresql"
+	"l0/pkg/convert"
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 )
-
-func msgHandler(msg *stan.Msg) {
-	log.Printf("Получено сообщение: %s\n", string(msg.Data))
-}
 
 type workerData struct {
 	ctx context.Context
 	sc  stan.Conn
 	sub stan.Subscription
 	id  uint8
+	db  *postgresql.DB
+}
+
+func (w *workerData) msgHandler(msg *stan.Msg) {
+	order := models.Order{}
+	if err := json.Unmarshal(msg.Data, &order); err != nil {
+		log.Println("msgHandler:", err)
+		return
+	}
+	w.db.InsertTransaction(&order)
 }
 
 func worker(wD *workerData) {
 	defer func() {
-		err := wD.sub.Unsubscribe()
-		if err != nil {
+		if err := wD.sub.Unsubscribe(); err != nil {
 			log.Println("sub:", wD.id, err)
 		}
-		err = wD.sc.Close()
-		if err != nil {
+		if err := wD.sc.Close(); err != nil {
 			log.Println("sc:", wD.id, err)
+		}
+		if err := wD.db.Conn.Close(); err != nil {
+			log.Println("db close:", wD.id, err)
 		}
 	}()
 
-main:
-	for {
-		select {
-		case <-wD.ctx.Done():
-			fmt.Println("Закругляется:", wD.id)
-			break main
-		default:
-			fmt.Println("Работает:", wD.id)
-			time.Sleep(time.Second * 3)
-		}
+	select {
+	case <-wD.ctx.Done():
+		//fmt.Println("[+] Done goroutine:", wD.id)
 	}
-
 }
 
 func runWorkers(ctx context.Context) {
-	for i := 0; i < 10; i++ {
-		wD := workerData{}
-		wD.ctx = ctx
-		wD.id = uint8(i)
-		id := "worker-" + strconv.Itoa(i)
+	wQ := env.Get().WorkerQuantity
+	for ; wQ > 0; wQ-- {
+		wD := workerData{ctx: ctx, id: uint8(wQ - 1)}
+		idStr := "worker-" + convert.NumToStr(wD.id)
+
 		var err error
-		wD.sc, err = stan.Connect("L0", id, stan.NatsURL(nats.DefaultURL))
-		if err != nil {
+		if wD.sc, err = stan.Connect("L0", idStr, stan.NatsURL(nats.DefaultURL)); err != nil {
 			log.Fatal(err)
 		}
-		//defer sc.Close()
-		wD.sub, err = wD.sc.QueueSubscribe("order", "order-workers", msgHandler,
-			stan.DurableName("order-workers"),
-			stan.MaxInflight(10)) // подписчик может обрабатывать не более 10 сообщений одновременно
-		if err != nil {
+		if wD.sub, err = wD.sc.QueueSubscribe("order", "order-workers", wD.msgHandler,
+			stan.DurableName("order-workers"), stan.MaxInflight(10)); err != nil { // подписчик может обрабатывать не более 10 сообщений одновременно
 			log.Fatal(err)
 		}
+		wD.db = postgresql.Conn()
 		go worker(&wD)
-		//defer sub.Unsubscribe()
 	}
+	log.Printf("[+] %d workers launched", env.Get().WorkerQuantity)
 }
 
 func Run() {
@@ -81,7 +80,10 @@ func Run() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	cancel()
-	log.Println("Shutdown workers ...")
-	time.Sleep(time.Second * 8)
-	log.Println("Workers exiting")
+	log.Println("[!] Shutdown workers ...")
+
+	shutdownTime := env.Get().WorkerShutdownTime
+	time.Sleep(time.Second * shutdownTime)
+
+	log.Println("[+] Workers exiting")
 }
