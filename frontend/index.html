@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Структура Golang как JSON</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            background-image:
+                    linear-gradient(rgba(0, 90, 102, 0.8) 1px, transparent 1px),
+                    linear-gradient(to right, rgba(0, 90, 102, 0.8) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .input-form {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .input-form input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .input-form input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: lime;
+            color: black;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .json-container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: transparent;
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.5;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+
+        }
+        .json-container pre {
+            margin: 0;
+        }
+        .json-container .json {
+            border-radius: 8px;
+            background-color: rgba(0, 72, 82, 0.5);
+            overflow: auto; /* Добавлено для прокрутки */
+            max-height: 400px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        function submitForm() {
+            let id = document.getElementById('id-input').value;
+            let url = '/get-json?id=' + id;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let jsonContainer = document.getElementById('json-container');
+                    jsonContainer.innerHTML = '<pre><code class="json">' + JSON.stringify(data, null, 2) + '</code></pre>';
+                    hljs.highlightAll();
+                    jsonContainer.style.display = 'block';
+                })
+                .catch(error => console.error(error));
+        }
+    </script>
+</head>
+<body>
+<div class="input-form">
+    <input type="text" id="id-input" placeholder="Введите ID заказа">
+    <input type="submit" value="Получить JSON" onclick="submitForm()">
+</div>
+<div id="json-container" class="json-container"></div>
+</body>
+</html>
