@@ -45,28 +45,15 @@ func handleGetJSON(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	log.Println("ID:", id)
 
-	order := db.SelectUsrOrder(id)
-	//jsonFile, err := os.Open("cmd/sender/model.json")
-	//if err != nil {
-	//	c.AbortWithError(http.StatusInternalServerError, err)
-	//	return
-	//}
-	//defer jsonFile.Close()
-	//byteJson, err := io.ReadAll(jsonFile)
-	//if err != nil {
-	//	c.AbortWithError(http.StatusInternalServerError, err)
-	//	return
-	//}
-	//var order models.Order
-	//err = json.Unmarshal(byteJson, &order)
-	//if err != nil {
-	//	c.AbortWithError(http.StatusInternalServerError, err)
-	//	return
-	//}
+	order, badRequest := db.SelectUsrOrder(id)
 
-	jsonData, err := json.Marshal(&order)
+	var jsonData []byte
+	if badRequest != nil {
+		jsonData, err = json.Marshal(&badRequest)
+	} else {
+		jsonData, err = json.Marshal(&order)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

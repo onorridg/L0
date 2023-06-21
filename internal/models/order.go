@@ -116,7 +116,9 @@ type Payment struct {
 	CustomFee    FlexStr   `json:"custom_fee" db:"custom_fee"`
 }
 
-type Items []struct {
+type Items struct {
+	Id          uint64    `db:"id"`
+	UserOrderId uint64    `db:"user_order_id"`
 	ChrtID      FlexStr   `json:"chrt_id" db:"chrt_id"`
 	TrackNumber string    `json:"track_number" db:"track_number"`
 	Price       FlexFloat `json:"price" db:"price"`
@@ -137,7 +139,7 @@ type Order struct {
 	Entry             string `json:"entry" db:"entry"`
 	Delivery          `json:"delivery"`
 	Payment           `json:"payment"`
-	Items             `json:"items"`
+	Items             []Items `json:"items"`
 	Locale            string  `json:"locale" db:"locale"`
 	InternalSignature string  `json:"internal_signature" db:"internal_signature"`
 	CustomerID        string  `json:"customer_id" db:"customer_id"`
@@ -146,4 +148,13 @@ type Order struct {
 	SmID              FlexStr `json:"sm_id" db:"sm_id"`
 	DateCreated       string  `json:"date_created" db:"date_created"`
 	OofShard          FlexStr `json:"oof_shard" db:"oof_shard"`
+}
+
+type kek struct {
+	ms int
+}
+
+type lol struct {
+	id int
+	kek
 }

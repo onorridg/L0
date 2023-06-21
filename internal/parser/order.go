@@ -58,11 +58,14 @@ func ItemStructToSlice(i int, order *models.Order, userOrderId int64) []interfac
 		itemV = itemV.Elem()
 	}
 
-	itemScl := make([]interface{}, itemV.NumField()+1)
+	itemScl := make([]interface{}, itemV.NumField()-1)
 
-	itemScl[0] = userOrderId
-	for j := 0; j < itemV.NumField(); j++ {
-		itemScl[j+1] = valueConverter(itemV.Field(j))
+	var j uint
+	itemScl[j] = userOrderId
+	j += 1
+	for i := 2; i < itemV.NumField(); i++ {
+		itemScl[j] = valueConverter(itemV.Field(i))
+		j += 1
 	}
 	return itemScl
 }

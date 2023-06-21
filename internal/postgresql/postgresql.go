@@ -22,6 +22,10 @@ type DB struct {
 	transaction
 }
 
+type BadRequest struct {
+	Err string
+}
+
 func (db *DB) insertItems(order *models.Order, userOrderId int64) error {
 	var err error
 
@@ -83,7 +87,18 @@ func (db *DB) InsertUserOrder(order *models.Order) {
 	log.Println("[+] Commit success. ID:", userOrderId)
 }
 
-func (db *DB) SelectUsrOrder(orderId uint64) *models.Order {
+func (db *DB) selectItems(orderId uint64, dbx *sqlx.DB) []models.Items {
+	queryStr := `SELECT * FROM item WHERE user_order_id = $1`
+	var userItems []models.Items
+
+	err := dbx.Select(&userItems, queryStr, orderId)
+	if err != nil {
+		log.Println(err)
+	}
+	return userItems
+}
+
+func (db *DB) SelectUsrOrder(orderId uint64) (*models.Order, *BadRequest) {
 	dbx := sqlx.NewDb(db.Conn, "postgres")
 
 	queryStr := `SELECT * FROM user_order WHERE id = $1`
@@ -92,10 +107,12 @@ func (db *DB) SelectUsrOrder(orderId uint64) *models.Order {
 	err := dbx.Get(&userOrder, queryStr, orderId)
 	if err != nil {
 		log.Println(err)
+		return nil, &BadRequest{Err: err.Error()}
 	}
-	fmt.Printf("User Order: %+v\n", userOrder)
 
-	return &userOrder
+	userOrder.Items = db.selectItems(orderId, dbx)
+
+	return &userOrder, nil
 }
 
 func initConn() *sql.DB {
