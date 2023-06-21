@@ -83,17 +83,19 @@ func (db *DB) InsertUserOrder(order *models.Order) {
 	log.Println("[+] Commit success. ID:", userOrderId)
 }
 
-func (db *DB) SelectUsrOrder(orderId int64) {
+func (db *DB) SelectUsrOrder(orderId uint64) *models.Order {
 	dbx := sqlx.NewDb(db.Conn, "postgres")
 
 	queryStr := `SELECT * FROM user_order WHERE id = $1`
 	var userOrder models.Order
 
-	err := dbx.Get(&userOrder, queryStr, 10)
+	err := dbx.Get(&userOrder, queryStr, orderId)
 	if err != nil {
 		log.Println(err)
 	}
 	fmt.Printf("User Order: %+v\n", userOrder)
+
+	return &userOrder
 }
 
 func initConn() *sql.DB {

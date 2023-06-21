@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"html/template"
-	"io"
-	"l0/internal/models"
+	"l0/internal/postgresql"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -18,6 +18,8 @@ import (
 type PageData struct {
 	JSON string
 }
+
+var db *postgresql.DB
 
 func handleIndex(c *gin.Context) {
 	tmpl, err := template.ParseFiles("frontend/index.html")
@@ -38,26 +40,31 @@ func handleIndex(c *gin.Context) {
 }
 
 func handleGetJSON(c *gin.Context) {
-	id := c.Query("id")
+	id, err := strconv.ParseUint(c.Query("id"), 10, 64)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	log.Println("ID:", id)
 
-	jsonFile, err := os.Open("cmd/sender/model.json")
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	defer jsonFile.Close()
-	byteJson, err := io.ReadAll(jsonFile)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	var order models.Order
-	err = json.Unmarshal(byteJson, &order)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
+	order := db.SelectUsrOrder(id)
+	//jsonFile, err := os.Open("cmd/sender/model.json")
+	//if err != nil {
+	//	c.AbortWithError(http.StatusInternalServerError, err)
+	//	return
+	//}
+	//defer jsonFile.Close()
+	//byteJson, err := io.ReadAll(jsonFile)
+	//if err != nil {
+	//	c.AbortWithError(http.StatusInternalServerError, err)
+	//	return
+	//}
+	//var order models.Order
+	//err = json.Unmarshal(byteJson, &order)
+	//if err != nil {
+	//	c.AbortWithError(http.StatusInternalServerError, err)
+	//	return
+	//}
 
 	jsonData, err := json.Marshal(&order)
 	if err != nil {
@@ -70,10 +77,8 @@ func handleGetJSON(c *gin.Context) {
 }
 
 func Run() {
-	//http.HandleFunc("/", handleIndex)
-	//http.HandleFunc("/get-json", handleGetJSON)
-	//
-	//log.Fatal(http.ListenAndServe(":8080", nil))
+	db = postgresql.Conn()
+	defer db.Conn.Close()
 
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -99,18 +104,18 @@ func Run() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutdown Server ...")
+	log.Println("Shutdown server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer func() {
 		cancel()
 	}()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		log.Fatal("Server shutdown:", err)
 	}
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 1 second.")
+		log.Println("Timeout of 1 second.")
 	}
 	log.Println("Server exiting")
 

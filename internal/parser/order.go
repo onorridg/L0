@@ -28,11 +28,11 @@ func OrderStructToSlice(order *models.Order) []interface{} {
 	deliveryV := orderV.FieldByName("Delivery")
 	paymentV := orderV.FieldByName("Payment")
 
-	structLen := (orderV.NumField() - 1) + (deliveryV.NumField() - 1) + (paymentV.NumField() - 1)
+	structLen := (orderV.NumField() - 2) + (deliveryV.NumField() - 1) + (paymentV.NumField() - 1)
 	orderSlc := make([]interface{}, structLen)
 	orderIndex := 0
 
-	for i := 0; i < orderV.NumField(); i++ {
+	for i := 1; i < orderV.NumField(); i++ {
 		if orderV.Type().Field(i).Name != "Items" &&
 			orderV.Type().Field(i).Name != "Payment" &&
 			orderV.Type().Field(i).Name != "Delivery" {
