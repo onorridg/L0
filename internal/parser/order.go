@@ -2,6 +2,7 @@ package parser
 
 import (
 	"l0/internal/models"
+	"l0/pkg/parser"
 	"reflect"
 )
 
@@ -63,7 +64,9 @@ func ItemStructToSlice(i int, order *models.Order, userOrderId int64) []interfac
 	var j uint
 	itemScl[j] = userOrderId
 	j += 1
-	for i := 2; i < itemV.NumField(); i++ {
+
+	start, _ := parser.GetFieldIndex(order.Items[i], "ChrtID")
+	for i := start; i < itemV.NumField(); i++ {
 		itemScl[j] = valueConverter(itemV.Field(i))
 		j += 1
 	}

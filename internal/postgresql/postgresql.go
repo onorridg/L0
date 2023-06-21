@@ -106,7 +106,6 @@ func (db *DB) SelectUsrOrder(orderId uint64) (*models.Order, *BadRequest) {
 
 	err := dbx.Get(&userOrder, queryStr, orderId)
 	if err != nil {
-		log.Println(err)
 		return nil, &BadRequest{Err: err.Error()}
 	}
 
