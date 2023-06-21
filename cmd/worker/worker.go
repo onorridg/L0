@@ -7,6 +7,6 @@ import (
 
 func main() {
 	_ = env.Get()
-	//go worker.Run()
+	//worker.Run()
 	server.Run()
 }

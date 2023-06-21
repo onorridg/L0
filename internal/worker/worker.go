@@ -27,10 +27,10 @@ type workerData struct {
 func (w *workerData) msgHandler(msg *stan.Msg) {
 	order := models.Order{}
 	if err := json.Unmarshal(msg.Data, &order); err != nil {
-		log.Println("msgHandler:", err)
+		log.Println("[!] msgHandler:", err)
 		return
 	}
-	w.db.InsertTransaction(&order)
+	w.db.InsertUserOrder(&order)
 }
 
 func worker(wD *workerData) {

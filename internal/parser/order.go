@@ -52,7 +52,7 @@ func OrderStructToSlice(order *models.Order) []interface{} {
 	return orderSlc
 }
 
-func ItemStructToSlice(i int, order *models.Order) []interface{} {
+func ItemStructToSlice(i int, order *models.Order, userOrderId int64) []interface{} {
 	itemV := reflect.ValueOf(order.Items[i])
 	if itemV.Kind() == reflect.Ptr {
 		itemV = itemV.Elem()
@@ -60,7 +60,7 @@ func ItemStructToSlice(i int, order *models.Order) []interface{} {
 
 	itemScl := make([]interface{}, itemV.NumField()+1)
 
-	itemScl[0] = order.OrderUID
+	itemScl[0] = userOrderId
 	for j := 0; j < itemV.NumField(); j++ {
 		itemScl[j+1] = valueConverter(itemV.Field(j))
 	}

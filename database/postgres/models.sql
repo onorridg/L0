@@ -1,6 +1,6 @@
 CREATE TABLE user_order (
                         id BIGSERIAL PRIMARY KEY,
-                        order_uid VARCHAR(255) UNIQUE,
+                        order_uid VARCHAR(255),
                         track_number VARCHAR(255),
                         entry VARCHAR(255),
                         locale VARCHAR(255),
@@ -32,7 +32,7 @@ CREATE TABLE user_order (
 
 CREATE TABLE item (
                        id BIGSERIAL PRIMARY KEY,
-                       order_uid VARCHAR,
+                       user_order_id BIGSERIAL,
                        chrt_id INT,
                        track_number VARCHAR(255),
                        price FLOAT,
@@ -44,5 +44,5 @@ CREATE TABLE item (
                        nm_id INT,
                        brand VARCHAR(255),
                        status INT,
-                       FOREIGN KEY (order_uid) REFERENCES user_order (order_uid)
+                       FOREIGN KEY (user_order_id) REFERENCES user_order (id)
 );
