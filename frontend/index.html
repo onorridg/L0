@@ -3,6 +3,7 @@
 <head>
     <title>Orders</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/atom-one-dark-reasonable.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             background-color: #000000;
@@ -59,6 +60,41 @@
             overflow: auto; /* Добавлено для прокрутки */
             max-height: 400px;
         }
+        .logo {
+            font-family: 'Arial', sans-serif;
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .logo span {
+            font-weight: bold;
+            color: #ff6600;
+            font-family: monospace;
+        }
+        .social-icons {
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            margin-right: 10px;
+            color: #FFA500;
+            text-decoration: none;
+        }
+
+        .social-icons i {
+            font-size: 40px;
+            vertical-align: middle;
+        }
+
+        .fab.fa-telegram {
+            color: #0088cc;
+        }
+
+        .fab.fa-github {
+            color: #333333;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
@@ -80,10 +116,15 @@
     </script>
 </head>
 <body>
+<div class="logo">L0 by <span>onorridg</span></div>
 <div class="input-form">
     <input type="text" id="id-input" placeholder="Введите ID заказа">
     <input type="submit" value="Получить JSON" onclick="submitForm()">
 </div>
 <div id="json-container" class="json-container"></div>
+<div class="social-icons">
+    <a href="https://t.me/onorridg" target="_blank"><i class="fab fa-telegram"></i></a>
+    <a href="https://github.com/onorridg/L0" target="_blank"><i class="fab fa-github"></i></a>
+</div>
 </body>
 </html>
