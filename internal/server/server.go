@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"l0/internal/postgresql"
+	"l0/pkg/inMemory"
 	"log"
 	"net/http"
 	"os"
@@ -46,7 +47,13 @@ func handleGetJSON(c *gin.Context) {
 		return
 	}
 
-	order := db.SelectUsrOrder(id)
+	order := inMemory.Conn().QueryData(id)
+	if order != nil {
+		c.Header("X-Cache-Status", "Hit")
+	} else {
+		order = db.SelectUsrOrder(id)
+		c.Header("X-Cache-Status", "Miss")
+	}
 
 	var jsonData []byte
 	jsonData, err = json.Marshal(&order)

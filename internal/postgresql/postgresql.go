@@ -26,20 +26,24 @@ type BadRequest struct {
 	Err string
 }
 
-func (db *DB) insertItems(order *models.Order, userOrderId int64) error {
+func (db *DB) insertItems(order *models.Order, userOrderId int64) ([]uint64, error) {
 	var err error
+	var id uint64
+	idItems := make([]uint64, len(order.Items))
 
 	for i := range order.Items {
 		queryStr := `
 		INSERT INTO item (user_order_id, chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`
-		_, err = db.tx.ExecContext(db.txCtx, queryStr, parser.ItemStructToSlice(i, order, userOrderId)...)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+		RETURNING id`
+		err = db.tx.QueryRowContext(db.txCtx, queryStr, parser.ItemStructToSlice(i, order, userOrderId)...).Scan(&id)
 		if err != nil {
 			db.tx.Rollback()
-			return err
+			return nil, nil
 		}
+		idItems[i] = id
 	}
-	return nil
+	return idItems, nil
 }
 
 func (db *DB) insertOrder(order *models.Order) (int64, error) {
@@ -57,7 +61,7 @@ func (db *DB) insertOrder(order *models.Order) (int64, error) {
 	return id, nil
 }
 
-func (db *DB) InsertUserOrder(order *models.Order) {
+func (db *DB) InsertUserOrder(order *models.Order) (uint64, []uint64, error) {
 	var err error
 
 	log.Println("[+] Start transaction.")
@@ -65,26 +69,29 @@ func (db *DB) InsertUserOrder(order *models.Order) {
 	db.tx, err = db.Conn.BeginTx(db.txCtx, nil)
 	if err != nil {
 		log.Fatal("[!] Init tx:", err)
+		return 0, nil, err
 	}
 
 	userOrderId, err := db.insertOrder(order)
 	if err != nil {
 		log.Println("[!] Commit fail.\n", err)
-		return
+		return 0, nil, err
 	}
 
-	if err = db.insertItems(order, userOrderId); err != nil {
+	idItems, err := db.insertItems(order, userOrderId)
+	if err != nil {
 		log.Println("[!] Commit fail.\n", err)
-		return
+		return 0, nil, err
 	}
 
 	err = db.tx.Commit()
 	if err != nil {
 		log.Println("[!] Commit fail.\n", err)
-		return
+		return 0, nil, err
 	}
 
 	log.Println("[+] Commit success. ID:", userOrderId)
+	return uint64(userOrderId), idItems, nil
 }
 
 func (db *DB) selectItems(orderId uint64, dbx *sqlx.DB) []models.Items {

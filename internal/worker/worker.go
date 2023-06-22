@@ -9,6 +9,7 @@ import (
 	"l0/internal/models"
 	"l0/internal/postgresql"
 	"l0/pkg/convert"
+	"l0/pkg/inMemory"
 	"log"
 	"os"
 	"os/signal"
@@ -30,7 +31,16 @@ func (w *workerData) msgHandler(msg *stan.Msg) {
 		log.Println("[!] msgHandler:", err)
 		return
 	}
-	w.db.InsertUserOrder(&order)
+
+	orderId, idItems, err := w.db.InsertUserOrder(&order)
+	if err == nil {
+		order.Id = orderId
+		for i := range order.Items {
+			order.Items[i].Id = idItems[i]
+			order.Items[i].UserOrderId = orderId
+		}
+		inMemory.Conn().InsertData(orderId, &order)
+	}
 }
 
 func worker(wD *workerData) {

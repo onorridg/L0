@@ -117,7 +117,7 @@ type Payment struct {
 }
 
 type Items struct {
-	Id          uint64    `db:"id"`
+	Id          uint64    `json:"id" db:"id"`
 	UserOrderId uint64    `db:"user_order_id"`
 	ChrtID      FlexStr   `json:"chrt_id" db:"chrt_id"`
 	TrackNumber string    `json:"track_number" db:"track_number"`
@@ -133,7 +133,7 @@ type Items struct {
 }
 
 type Order struct {
-	Id                uint64 `db:"id"`
+	Id                uint64 `json:"id" db:"id"`
 	OrderUID          string `json:"order_uid" db:"order_uid"`
 	TrackNumber       string `json:"track_number" db:"track_number"`
 	Entry             string `json:"entry" db:"entry"`
