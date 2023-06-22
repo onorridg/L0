@@ -98,7 +98,7 @@ func (db *DB) selectItems(orderId uint64, dbx *sqlx.DB) []models.Items {
 	return userItems
 }
 
-func (db *DB) SelectUsrOrder(orderId uint64) (*models.Order, *BadRequest) {
+func (db *DB) SelectUsrOrder(orderId uint64) any {
 	dbx := sqlx.NewDb(db.Conn, "postgres")
 
 	queryStr := `SELECT * FROM user_order WHERE id = $1`
@@ -106,12 +106,12 @@ func (db *DB) SelectUsrOrder(orderId uint64) (*models.Order, *BadRequest) {
 
 	err := dbx.Get(&userOrder, queryStr, orderId)
 	if err != nil {
-		return nil, &BadRequest{Err: err.Error()}
+		return &BadRequest{Err: err.Error()}
 	}
 
 	userOrder.Items = db.selectItems(orderId, dbx)
 
-	return &userOrder, nil
+	return &userOrder
 }
 
 func initConn() *sql.DB {

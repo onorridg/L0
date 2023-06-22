@@ -42,18 +42,15 @@ func handleIndex(c *gin.Context) {
 func handleGetJSON(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Query("id"), 10, 64)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	order, badRequest := db.SelectUsrOrder(id)
+	order := db.SelectUsrOrder(id)
 
 	var jsonData []byte
-	if badRequest != nil {
-		jsonData, err = json.Marshal(&badRequest)
-	} else {
-		jsonData, err = json.Marshal(&order)
-	}
+	jsonData, err = json.Marshal(&order)
+
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
