@@ -47,14 +47,14 @@ func handleGetJSON(c *gin.Context) {
 		return
 	}
 
-	order := inMemory.Conn().QueryData(id)
+	order := inMemory.Conn().QueryOrder(id)
 	if order != nil {
 		c.Header("X-Cache-Status", "Hit")
 	} else {
 		c.Header("X-Cache-Status", "Miss")
 
 		var orderId uint64
-		orderId, order, err = db.SelectUsrOrder(id)
+		orderId, order, err = db.SelectUserOrder(id)
 		if err == nil {
 			inMemory.Conn().InsertData(orderId, &order)
 		}

@@ -83,7 +83,7 @@ func Run() {
 	cancel()
 	log.Println("[!] Shutdown workers ...")
 
-	shutdownTime := env.Get().WorkerShutdownTime
+	shutdownTime := env.Get().WorkerShutdownTimeSeconds
 	time.Sleep(time.Second * shutdownTime)
 
 	log.Println("[+] Workers exiting")

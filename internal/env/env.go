@@ -23,8 +23,10 @@ type data struct {
 	NatsDurableName string
 	NatsPgDatabase  string
 
-	WorkerQuantity     uint
-	WorkerShutdownTime time.Duration
+	WorkerQuantity            uint
+	WorkerShutdownTimeSeconds time.Duration
+
+	CacheSize uint64
 }
 
 var envData *data
@@ -53,7 +55,11 @@ func initEnv() {
 	if _, err = fmt.Sscan(os.Getenv("WORKER_QUANTITY"), &envData.WorkerQuantity); err != nil {
 		log.Fatal(err)
 	}
-	if _, err = fmt.Sscan(os.Getenv("WORKER_SHUTDOWN_TIME"), &envData.WorkerShutdownTime); err != nil {
+	if _, err = fmt.Sscan(os.Getenv("WORKER_SHUTDOWN_TIME_SECONDS"), &envData.WorkerShutdownTimeSeconds); err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err = fmt.Sscan(os.Getenv("CACHE_SIZE"), &envData.CacheSize); err != nil {
 		log.Fatal(err)
 	}
 }
