@@ -149,12 +149,3 @@ type Order struct {
 	DateCreated       string  `json:"date_created" db:"date_created"`
 	OofShard          FlexStr `json:"oof_shard" db:"oof_shard"`
 }
-
-type kek struct {
-	ms int
-}
-
-type lol struct {
-	id int
-	kek
-}
