@@ -20,8 +20,6 @@ type PageData struct {
 	JSON string
 }
 
-var db *postgresql.DB
-
 func handleIndex(c *gin.Context) {
 	tmpl, err := template.ParseFiles("frontend/index.html")
 	if err != nil {
@@ -53,6 +51,9 @@ func handleGetJSON(c *gin.Context) {
 	} else {
 		c.Header("X-Cache-Status", "Miss")
 
+		db := postgresql.Conn()
+		defer db.Conn.Close()
+
 		var orderId uint64
 		orderId, order, err = db.SelectUserOrder(id)
 		if err == nil {
@@ -73,9 +74,6 @@ func handleGetJSON(c *gin.Context) {
 }
 
 func Run() {
-	db = postgresql.Conn()
-	defer db.Conn.Close()
-
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
