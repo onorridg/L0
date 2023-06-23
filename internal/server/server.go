@@ -51,8 +51,13 @@ func handleGetJSON(c *gin.Context) {
 	if order != nil {
 		c.Header("X-Cache-Status", "Hit")
 	} else {
-		order = db.SelectUsrOrder(id)
 		c.Header("X-Cache-Status", "Miss")
+
+		var orderId uint64
+		orderId, order, err = db.SelectUsrOrder(id)
+		if err == nil {
+			inMemory.Conn().InsertData(orderId, &order)
+		}
 	}
 
 	var jsonData []byte
@@ -90,24 +95,24 @@ func Run() {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-	log.Print("Server Started")
+	log.Print("[+] Frontend server started.")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutdown server ...")
+	log.Println("[*] Shutdown server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer func() {
 		cancel()
 	}()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server shutdown:", err)
+		log.Fatal("[!] Server shutdown:", err)
 	}
 	select {
 	case <-ctx.Done():
-		log.Println("Timeout of 1 second.")
+		log.Println("[*] Timeout of 1 second.")
 	}
-	log.Println("Server exiting")
+	log.Println("[+] Server exiting")
 
 }

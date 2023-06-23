@@ -1,13 +1,10 @@
-PHONY: run sender worker polygon
+PHONY: sender services polygon
 
 sender:
 	go run cmd/sender/sender.go
 
-worker:
-	go run cmd/worker/worker.go
-
-run:
-	go run cmd/server/main.go
+services:
+	go run cmd/services/services.go
 
 polygon:
 	go run cmd/polygon/polygon.go
