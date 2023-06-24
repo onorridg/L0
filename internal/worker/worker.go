@@ -64,7 +64,7 @@ func runWorkers(ctx context.Context) {
 			log.Fatal(err)
 		}
 		if wD.sub, err = wD.sc.QueueSubscribe("order", "order-workers", wD.msgHandler,
-			stan.DurableName("order-workers"), stan.MaxInflight(10)); err != nil { // подписчик может обрабатывать не более 10 сообщений одновременно
+			stan.DurableName("order-workers"), stan.StartWithLastReceived()); err != nil {
 			log.Fatal(err)
 		}
 		wD.db = postgresql.Conn()

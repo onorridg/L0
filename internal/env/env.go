@@ -9,11 +9,13 @@ import (
 )
 
 type data struct {
-	PgHost     string
-	PgUser     string
-	PgPassword string
-	PgPort     string
-	PgDatabase string
+	PgHost           string
+	PgUserAdmin      string
+	PgPasswordAdmin  string
+	PgPort           string
+	PgDatabase       string
+	PgUserWorker     string
+	PgPasswordWorker string
 
 	NatsPort        string
 	NatsPortHttp    string
@@ -39,10 +41,12 @@ func initEnv() {
 
 	envData = &data{}
 	envData.PgHost = os.Getenv("PG_HOST")
-	envData.PgUser = os.Getenv("PG_USER")
-	envData.PgPassword = os.Getenv("PG_PASSWORD")
+	envData.PgUserAdmin = os.Getenv("PG_USER_ADMIN")
+	envData.PgPasswordAdmin = os.Getenv("PG_PASSWORD_ADMIN")
 	envData.PgPort = os.Getenv("PG_PORT")
 	envData.PgDatabase = os.Getenv("PG_DATABASE")
+	envData.PgUserWorker = os.Getenv("PG_USER_WORKER")
+	envData.PgPasswordWorker = os.Getenv("PG_PASSWORD_WORKER")
 
 	envData.NatsPort = os.Getenv("NATS_PORT")
 	envData.NatsPortHttp = os.Getenv("NATS_PORT_HTTP")

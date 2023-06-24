@@ -17,8 +17,8 @@ type DB struct {
 }
 
 func initConn() *sqlx.DB {
-	user := env.Get().PgUser
-	password := env.Get().PgPassword
+	user := env.Get().PgUserWorker
+	password := env.Get().PgPasswordWorker
 	host := env.Get().PgHost
 	port := env.Get().PgPort
 	dbName := env.Get().PgDatabase
