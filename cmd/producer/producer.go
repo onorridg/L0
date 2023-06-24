@@ -24,7 +24,7 @@ func main() {
 	//	log.Fatalf("Failed to publish message: %v", err)
 	//}
 
-	jsonFile, err := os.Open("cmd/sender/model.json")
+	jsonFile, err := os.Open("cmd/producer/model.json")
 	if err != nil {
 		log.Fatal(err)
 	}

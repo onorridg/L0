@@ -2,9 +2,9 @@ package main
 
 import (
 	"l0/internal/env"
+	"l0/internal/inMemory"
 	"l0/internal/server"
 	"l0/internal/worker"
-	"l0/pkg/inMemory"
 )
 
 func main() {

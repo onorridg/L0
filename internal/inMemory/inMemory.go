@@ -57,6 +57,7 @@ func (m *InMemory) QueryOrder(id uint64) any {
 
 	data, exist := m.cache[id]
 	if exist {
+		data.updatedAt = time.Now()
 		return data.row
 	}
 	return nil

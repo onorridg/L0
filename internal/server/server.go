@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"html/template"
+	"l0/internal/inMemory"
 	"l0/internal/postgresql"
-	"l0/pkg/inMemory"
 	"log"
 	"net/http"
 	"os"
@@ -57,7 +57,7 @@ func handleGetJSON(c *gin.Context) {
 		var orderId uint64
 		orderId, order, err = db.SelectUserOrder(id)
 		if err == nil {
-			inMemory.Conn().InsertData(orderId, &order)
+			inMemory.Conn().Append(orderId, &order)
 		}
 	}
 

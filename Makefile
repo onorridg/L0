@@ -1,7 +1,7 @@
-PHONY: sender services polygon
+PHONY: producer services polygon
 
-sender:
-	go run cmd/sender/sender.go
+producer:
+	go run cmd/producer/producer.go
 
 services:
 	go run cmd/services/services.go
