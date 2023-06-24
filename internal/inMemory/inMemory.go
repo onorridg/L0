@@ -77,7 +77,7 @@ func Conn() *InMemory {
 	if dataBase == nil {
 		dataBase = &InMemory{}
 		dataBase.cache = make(map[uint64]cache, env.Get().CacheSize)
-		dataBase.restoreDataFromPostgres()
+		//dataBase.restoreDataFromPostgres()
 	}
 	return dataBase
 }
