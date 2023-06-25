@@ -32,14 +32,10 @@ CACHE_SIZE=100
 ```
 Поднятие postgresql и nats streaming:
 ```bash
-docker-compoe up -d
+docker-compose up -d
 ```
-Подготовка базы данных (зависимость от psql):
-```bash
-PGPASSWORD=admin psql -h localhost -p 5432 -U admin -d service  -f database/postgres/models.sql
-PGPASSWORD=admin psql -h localhost -p 5432 -U admin -d service  -f database/postgres/worker.sql
-```
+
 Запуск сервиса (worker, inMemory и frontend server)
 ```bash
-make service
+make services
 ```

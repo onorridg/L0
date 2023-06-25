@@ -57,7 +57,7 @@ func handleGetJSON(c *gin.Context) {
 		var orderId uint64
 		orderId, order, err = db.SelectUserOrder(id)
 		if err == nil {
-			inMemory.Conn().Append(orderId, &order)
+			inMemory.Conn().Append(orderId, order)
 		}
 	}
 

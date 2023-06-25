@@ -28,7 +28,7 @@ func (m *InMemory) evict() {
 	for id, row := range m.cache {
 		if cacheRowId == 0 {
 			cacheRowId, cacheRowTime = id, row.updatedAt
-		} else if cacheRowTime.Before(row.updatedAt) {
+		} else if cacheRowTime.After(row.updatedAt) {
 			cacheRowId, cacheRowTime = id, row.updatedAt
 		}
 	}
@@ -47,7 +47,7 @@ func (m *InMemory) restoreDataFromPostgres() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	for _, order := range orders {
-		m.cache[order.Id] = cache{row: &order, updatedAt: time.Now()}
+		m.cache[order.Id] = cache{row: order, updatedAt: time.Now()}
 	}
 }
 
@@ -65,10 +65,11 @@ func (m *InMemory) QueryOrder(id uint64) any {
 
 func (m *InMemory) Append(id uint64, data any) {
 	m.mu.Lock()
-	m.cache[id] = cache{row: &data, updatedAt: time.Now()}
+	m.cache[id] = cache{row: data, updatedAt: time.Now()}
 	m.mu.Unlock()
 
-	if float64(len(m.cache)) > float64(env.Get().CacheSize)*0.2 {
+	// If cache size is larger than the set value, then delete the one oldest cache row.
+	if uint64(len(m.cache)) > env.Get().CacheSize {
 		m.evict()
 	}
 }
@@ -77,7 +78,7 @@ func Conn() *InMemory {
 	if dataBase == nil {
 		dataBase = &InMemory{}
 		dataBase.cache = make(map[uint64]cache, env.Get().CacheSize)
-		//dataBase.restoreDataFromPostgres()
+		dataBase.restoreDataFromPostgres()
 	}
 	return dataBase
 }

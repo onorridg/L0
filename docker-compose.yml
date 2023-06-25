@@ -7,6 +7,7 @@ services:
     networks:
       - l0-services
     volumes:
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
       - ./data/postgresql:/var/lib/postgresql/data
     env_file:
       - .env
@@ -21,6 +22,8 @@ services:
   nats-streaming:
     image: "nats-streaming:latest"
     container_name: nats-streaming
+    depends_on:
+      - pgsql
     restart: on-failure
     networks:
       - l0-services
@@ -29,11 +32,7 @@ services:
     ports:
       - "${NATS_PORT}:${NATS_PORT}"
       - "${NATS_PORT_HTTP}:${NATS_PORT_HTTP}"
-    command:
-      - "--cluster_id"
-      - "${NATS_CLUSTER_ID}"
-      - "--http_port"
-      - "${NATS_PORT_HTTP}"
+    command: "--cluster_id ${NATS_CLUSTER_ID} --http_port ${NATS_PORT_HTTP} -store sql -sql_driver postgres -sql_source \"user=ns_user password=ns_user host=pgsql port=${PG_PORT} dbname=service readTimeout=5s writeTimeout=5s sslmode=disable\""
 
 networks:
   l0-services:

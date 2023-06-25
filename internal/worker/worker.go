@@ -30,15 +30,15 @@ func (w *workerData) msgHandler(msg *stan.Msg) {
 		log.Println("[!] msgHandler:", err)
 		return
 	}
-
+	err := w.db.Conn.Ping()
+	if err != nil {
+		log.Println(err)
+	}
 	w.db.InsertUserOrder(&order)
 }
 
 func worker(wD *workerData) {
 	defer func() {
-		if err := wD.sub.Unsubscribe(); err != nil {
-			log.Println("sub:", wD.id, err)
-		}
 		if err := wD.sc.Close(); err != nil {
 			log.Println("sc:", wD.id, err)
 		}
@@ -56,19 +56,19 @@ func worker(wD *workerData) {
 func runWorkers(ctx context.Context) {
 	wQ := env.Get().WorkerQuantity
 	for ; wQ > 0; wQ-- {
-		wD := workerData{ctx: ctx, id: uint8(wQ - 1)}
+		wD := &workerData{ctx: ctx, id: uint8(wQ - 1)}
 		idStr := "worker-" + convert.NumToStr(wD.id)
+		wD.db = postgresql.Conn()
 
 		var err error
-		if wD.sc, err = stan.Connect("L0", idStr, stan.NatsURL(nats.DefaultURL)); err != nil {
+		if wD.sc, err = stan.Connect(env.Get().NatsClusterId, idStr, stan.NatsURL(nats.DefaultURL)); err != nil {
 			log.Fatal(err)
 		}
-		if wD.sub, err = wD.sc.QueueSubscribe("order", "order-workers", wD.msgHandler,
-			stan.DurableName("order-workers"), stan.StartWithLastReceived()); err != nil {
+		if wD.sub, err = wD.sc.QueueSubscribe(env.Get().NatsSubject, env.Get().NatsGroup, wD.msgHandler,
+			stan.DurableName(env.Get().NatsDurableName)); err != nil {
 			log.Fatal(err)
 		}
-		wD.db = postgresql.Conn()
-		go worker(&wD)
+		go worker(wD)
 	}
 	log.Printf("[+] %d workers launched.", env.Get().WorkerQuantity)
 }
