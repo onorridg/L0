@@ -2,40 +2,13 @@
 ![image](https://github.com/onorridg/L0/assets/83474704/a7e836bd-5836-4748-9b66-5b35897c6db5)
 
 
-## Подготовка окружения:
-Создать в корне проекта файл `.env`:
-```.env
-# postgresql
-PG_HOST=localhost
-PG_PORT=5432
-PG_USER_ADMIN=admin
-PG_PASSWORD_ADMIN=admin
-PG_DATABASE=service
-PG_USER_WORKER=worker
-PG_PASSWORD_WORKER=worker
-
-# nats-streaming
-NATS_PORT=4222
-NATS_PORT_HTTP=8222
-NATS_CLUSTER_ID=L0
-NATS_SUBJECT=order
-NATS_GROUP=order-workers
-NATS_DURABLE_NAME=order-workers
-NATS_PG_DATABASE=order
-
-# worker
-WORKER_QUANTITY=10
-WORKER_SHUTDOWN_TIME_SECONDS=2
-
-# inMemory (cache)
-CACHE_SIZE=100
-```
-Поднятие postgresql и nats streaming:
+## Первый запуск сервиса(L0) и окружения:
 ```bash
-docker-compose up -d
+cat .env.example > .env
+docker-compose up
 ```
-
-Запуск сервиса (worker, inMemory и frontend server)
+## Повторный запуск и остановка сервиса и окружения:
 ```bash
-make services
+docker-compose start  # запуск
+docker-compose stop   # остановка
 ```

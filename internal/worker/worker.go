@@ -3,7 +3,6 @@ package worker
 import (
 	"context"
 	"encoding/json"
-	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 	"l0/internal/env"
 	"l0/internal/models"
@@ -49,7 +48,6 @@ func worker(wD *workerData) {
 
 	select {
 	case <-wD.ctx.Done():
-		//fmt.Println("[+] Done goroutine:", wD.id)
 	}
 }
 
@@ -61,7 +59,8 @@ func runWorkers(ctx context.Context) {
 		wD.db = postgresql.Conn()
 
 		var err error
-		if wD.sc, err = stan.Connect(env.Get().NatsClusterId, idStr, stan.NatsURL(nats.DefaultURL)); err != nil {
+		hostPort := env.Get().NatsHost + ":" + env.Get().NatsPort
+		if wD.sc, err = stan.Connect(env.Get().NatsClusterId, idStr, stan.NatsURL("nats://"+hostPort)); err != nil {
 			log.Fatal(err)
 		}
 		if wD.sub, err = wD.sc.QueueSubscribe(env.Get().NatsSubject, env.Get().NatsGroup, wD.msgHandler,

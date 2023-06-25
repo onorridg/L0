@@ -34,6 +34,21 @@ services:
       - "${NATS_PORT_HTTP}:${NATS_PORT_HTTP}"
     command: "--cluster_id ${NATS_CLUSTER_ID} --http_port ${NATS_PORT_HTTP} -store sql -sql_driver postgres -sql_source \"user=ns_user password=ns_user host=pgsql port=${PG_PORT} dbname=service readTimeout=5s writeTimeout=5s sslmode=disable\""
 
+  services:
+    container_name: services
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      - pgsql
+      - nats-streaming
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    networks:
+      - l0-services
+
 networks:
   l0-services:
     driver: bridge

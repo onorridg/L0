@@ -17,6 +17,7 @@ type data struct {
 	PgUserWorker     string
 	PgPasswordWorker string
 
+	NatsHost        string
 	NatsPort        string
 	NatsPortHttp    string
 	NatsClusterId   string
@@ -27,6 +28,7 @@ type data struct {
 
 	WorkerQuantity            uint
 	WorkerShutdownTimeSeconds time.Duration
+	FrontendPort              string
 
 	CacheSize uint64
 }
@@ -48,6 +50,7 @@ func initEnv() {
 	envData.PgUserWorker = os.Getenv("PG_USER_WORKER")
 	envData.PgPasswordWorker = os.Getenv("PG_PASSWORD_WORKER")
 
+	envData.NatsHost = os.Getenv("NATS_HOST")
 	envData.NatsPort = os.Getenv("NATS_PORT")
 	envData.NatsPortHttp = os.Getenv("NATS_PORT_HTTP")
 	envData.NatsClusterId = os.Getenv("NATS_CLUSTER_ID")
@@ -56,6 +59,7 @@ func initEnv() {
 	envData.NatsDurableName = os.Getenv("NATS_DURABLE_NAME")
 	envData.NatsPgDatabase = os.Getenv("NATS_PG_DATABASE")
 
+	envData.FrontendPort = os.Getenv("FRONTEND_PORT")
 	if _, err = fmt.Sscan(os.Getenv("WORKER_QUANTITY"), &envData.WorkerQuantity); err != nil {
 		log.Fatal(err)
 	}

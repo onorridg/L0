@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"html/template"
+	"l0/internal/env"
 	"l0/internal/inMemory"
 	"l0/internal/postgresql"
 	"log"
@@ -83,8 +84,9 @@ func Run() {
 		basePath.GET("/get-json", handleGetJSON)
 	}
 
+	port := env.Get().FrontendPort
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: r,
 	}
 
