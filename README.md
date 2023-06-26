@@ -1,5 +1,6 @@
 # L0
-![image](https://github.com/onorridg/L0/assets/83474704/a7e836bd-5836-4748-9b66-5b35897c6db5)
+![Screenshot from 2023-06-23 20-12-45](https://github.com/onorridg/L0/assets/83474704/b1fa246d-d3a7-4893-a164-f7df6e009a8f)
+
 
 
 ## Первый запуск сервиса(L0) и окружения:
