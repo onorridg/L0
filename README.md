@@ -39,6 +39,6 @@ make producer
 
 У nats streaming в качестве хранилища установлен `postgresql`, так что, при выключении `nats streaming`, необработанные сообщения никуда не пропадут.
 
-Созданы 2 пользователя для `postgresql` (ознакомится можно в файле `docker_postgres_init.sql`):
+Созданы 2 пользователя для `postgresql` (ознакомиться можно в файле `docker_postgres_init.sql`):
 - `ns_user` с правами на таблицы предназначенные для `nats streaming`. 
 - `worker` c правами на таблицы предназначенные для`services`. 
