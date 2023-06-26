@@ -26,7 +26,7 @@ make producer
 - `Services`:
     - `worker`: 
       - Отвечает за обработку сообщений из `nats streaming`, записывает данные в `postgresql`.
-      - По дефолту запускается 10 воркеров(горутин), их можно изменить в .env:WORKER_QUANTITY
+      - По дефолту запускается 10 воркеров(горутин), их можно изменить в `.env:WORKER_QUANTITY`
     - `frontend server`: 
         - Endpoints:
             - http://localhost:8080/ отвечает за интерфейс.
